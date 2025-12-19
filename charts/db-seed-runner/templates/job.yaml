@@ -1,0 +1,32 @@
+{{- if .Values.seed.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "fullname" . }}
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      annotations:
+        seed/checksum: {{ .Values.seed.checksum | quote }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: seeder
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: IfNotPresent
+
+          # env:
+          #   - name: SQL_DIR
+          #     value: {{ .Values.seed.sqlMountPath | quote }}
+
+          volumeMounts:
+            - name: seed-sql
+              mountPath: {{ .Values.seed.sqlMountPath }}
+              readOnly: true
+
+      volumes:
+        - name: seed-sql
+          configMap:
+            name: {{ .Values.seed.sqlConfigMapName }}
+{{- end }}

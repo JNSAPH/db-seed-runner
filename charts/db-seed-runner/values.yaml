@@ -1,0 +1,22 @@
+image:
+  repository: your-org/db-seeder
+  tag: latest
+
+seed:
+  enabled: true
+  sqlConfigMapName: ""
+  checksum: ""
+  sqlMountPath: /seed/sql
+
+database:
+  engine: postgres
+  host: localhost
+  port: 5432
+  name: mydatabase
+  user: dbuser
+  password: dbpassword
+
+logging:
+  level: info
+
+# Resources maybe?
