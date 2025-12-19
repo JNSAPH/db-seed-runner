@@ -17,9 +17,10 @@ const DefaultConfigPath = "./config"
 
 type config struct {
 	Log struct {
-		Level string `mapstructure:"level" validate:"required,oneof=debug info warn error fatal panic"`
+		Level string `mapstructure:"level" validate:"required,oneof=debug info warn error fatal panic trace"`
 	} `mapstructure:"log" validate:"required"`
 	Database struct {
+		Engine   string `mapstructure:"engine" validate:"required,oneof=postgres mysql sqlite"`
 		Host     string `mapstructure:"host" validate:"required"`
 		Port     int    `mapstructure:"port" validate:"required,min=1"`
 		User     string `mapstructure:"user" validate:"required"`

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: db-seed-runner
+description: Go-based PostgreSQL seeding runner with Helm chart support
+
+type: application
+version: 0.0.1
+appVersion: 0.0.1

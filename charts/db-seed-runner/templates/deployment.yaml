@@ -1,0 +1,9 @@
+apiVersion: apps/v1
+kind: Job
+metadata:
+  name: {{ include "fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "labels" . | nindent 4 }}
+
+# https://github.com/helm/examples/blob/main/charts/hello-world/templates/deployment.yaml

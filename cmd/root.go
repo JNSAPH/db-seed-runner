@@ -19,6 +19,21 @@ var rootCmd = &cobra.Command{
 		internal.SetupLogger()
 		internal.SetupConfig()
 
+		level, err := logrus.ParseLevel(internal.AppConfig.Log.Level)
+		if err != nil {
+			logrus.Warnf("Invalid log level '%s', defaulting to info", internal.AppConfig.Log.Level)
+			level = logrus.InfoLevel
+		}
+		logrus.SetLevel(level)
+
+		engine := internal.AppConfig.Database.Engine
+		logrus.Infof("Using database engine: %s", engine)
+
+		switch engine {
+		default:
+			logrus.Fatalf("Unsupported database engine: %s", engine)
+		}
+
 		logrus.Info("Starting db-seed-runner...")
 
 	},
