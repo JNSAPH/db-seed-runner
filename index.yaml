@@ -3,12 +3,22 @@ entries:
   db-seed-runner:
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2025-12-20T23:19:19.6312508+01:00"
+    created: "2025-12-22T00:05:58.179322+01:00"
     description: Go-based PostgreSQL seeding runner with Helm chart support
-    digest: 3033ca1aafe874ff9baf1133b0ab0c74ab84539be4ef66091308e40438c11aa1
+    digest: 70d8873f9ed1f6d47b60c8f738d52d1d6163e8fd116276ba343bae068f1f8102
     name: db-seed-runner
     type: application
     urls:
-    - https://jnsaph.github.io/db-seed-runner/db-seed-runner-0.0.1.tgz
-    version: 0.0.1
-generated: "2025-12-20T23:19:19.6287428+01:00"
+    - https://jnsaph.github.io/db-seed-runner/db-seed-runner-0.0.1-dev.1.tgz
+    version: 0.0.1-dev.1
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2025-12-22T00:05:58.179147+01:00"
+    description: Go-based PostgreSQL seeding runner with Helm chart support
+    digest: d51f4f030de2ec57147ac44ef68053e91d8ac753fbdc38a4ec36432787b5034e
+    name: db-seed-runner
+    type: application
+    urls:
+    - https://jnsaph.github.io/db-seed-runner/db-seed-runner-0.0.1-alpha.1.tgz
+    version: 0.0.1-alpha.1
+generated: "2025-12-22T00:05:58.178459+01:00"
