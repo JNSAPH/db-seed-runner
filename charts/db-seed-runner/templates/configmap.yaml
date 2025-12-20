@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+data:
+  DB_ENGINE: {{ .Values.database.engine | quote }}
+  DB_HOST: {{ .Values.database.host | quote }}
+  DB_PORT: {{ .Values.database.port | quote }}
+  DB_NAME: {{ .Values.database.name | quote }}
+  DB_USER: {{ .Values.database.user | quote }}
+
+  SQL_DIR: {{ .Values.seed.sqlMountPath | quote }}
+
+  LOG_LEVEL: {{ .Values.logging.level | quote }}
