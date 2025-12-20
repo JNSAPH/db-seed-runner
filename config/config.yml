@@ -1,0 +1,13 @@
+seed:
+  enabled: true
+  sqlMountPath: ./sql
+database:
+  engine: postgres
+  host: localhost
+  port: 5432
+  database: postgres
+  sslmode: disable
+  # username: user -> Are set via environment variables, check the Makefile
+  # password: pass -> same as above
+logging:
+  level: INFO
