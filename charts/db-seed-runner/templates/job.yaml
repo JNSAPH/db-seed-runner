@@ -1,0 +1,48 @@
+{{- if .Values.seed.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "fullname" . }}-{{ .Release.Revision }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  backoffLimit: 1
+  {{- if .Values.seed.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ .Values.seed.ttlSecondsAfterFinished }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        seed/checksum: {{ .Values.seed.checksum | quote }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: seeder
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+
+          envFrom:
+            - secretRef:
+                name: {{ include "fullname" . }}-secret
+
+{{- if .Values.seed.debug }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - sleep infinity
+{{- end }}
+
+          volumeMounts:
+            - name: seed-sql
+              mountPath: {{ .Values.seed.sqlMountPath }}
+              readOnly: true
+            - name: app-config
+              mountPath: /app/config
+              readOnly: true
+
+      volumes:
+        - name: seed-sql
+          configMap:
+            name: {{ .Values.seed.sqlConfigMapName }}
+        - name: app-config
+          configMap:
+            name: {{ include "fullname" . }}-config
+{{- end }}

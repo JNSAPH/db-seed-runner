@@ -1,0 +1,6 @@
+bin/
+charts/
+helm-releases/
+.git/
+.gh-pages/
+.DS_Store

@@ -1,0 +1,26 @@
+image:
+  repository: ghcr.io/jnsaph/db-seed-runner
+  tag: ""
+
+seed:
+  enabled: true
+  debug: false
+  sqlConfigMapName: ""
+  checksum: ""
+  sqlMountPath: /app/sql
+  # Set to auto-delete Job after N seconds. Leave empty to keep until manually deleted.
+  ttlSecondsAfterFinished: ""
+
+database:
+  engine: postgres
+  host: localhost
+  port: 5432
+  database: "postgres"
+  user: dbuser
+  password: dbpassword
+  sslmode: disable
+
+logging:
+  level: info
+
+# Resources maybe?
