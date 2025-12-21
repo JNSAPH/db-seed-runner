@@ -3,5 +3,5 @@ name: db-seed-runner
 description: Go-based PostgreSQL seeding runner with Helm chart support
 
 type: application
-version: 0.0.1-alpha.1
+version: 0.0.1-dev.1
 appVersion: 0.0.1
