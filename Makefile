@@ -10,9 +10,6 @@ REPO_URL := https://jnsaph.github.io/db-seed-runner
 CHART_VERSION := $(shell yq '.version' $(HELM_CHART_DIR)/Chart.yaml)
 CHART_NAME := $(shell yq '.name' $(HELM_CHART_DIR)/Chart.yaml)
 
-
-
-
 build:
 	go build -o bin/$(EXECUTABLE) 
 
