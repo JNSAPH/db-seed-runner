@@ -25,3 +25,13 @@ module "db_seed_runner" {
   version = "x.y.z"
 }
 ```
+
+# FAQ & Common Issues
+
+## Error: `could not download chart: Chart.yaml file is missing`
+
+This error occurs when Terraform detects a local directory with the same name as the chart (e.g., `db-seed-runner`) in the same directory where `terraform apply` is running. The Helm provider prioritizes the local directory over the remote repository, and if that directory doesn't contain a `Chart.yaml`, the error is raised.
+
+**Solution:**
+Rename the local Terraform module or directory to something different (e.g., `db-seed`) to avoid the conflict.
+

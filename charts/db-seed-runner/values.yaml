@@ -1,13 +1,10 @@
-seed:
-  enabled: true
-  debug: true
-
 image:
-  repository: your-org/db-seeder
+  repository: busybox
   tag: latest
 
 seed:
   enabled: true
+  debug: false
   sqlConfigMapName: ""
   checksum: ""
   sqlMountPath: /seed/sql
