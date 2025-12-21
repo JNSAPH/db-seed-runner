@@ -1,3 +1,7 @@
+seed:
+  enabled: true
+  debug: true
+
 image:
   repository: your-org/db-seeder
   tag: latest

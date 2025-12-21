@@ -6,6 +6,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   backoffLimit: 1
+  ttlSecondsAfterFinished: 300
   template:
     metadata:
       annotations:
@@ -17,9 +18,15 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: IfNotPresent
 
-          # env:
-          #   - name: SQL_DIR
-          #     value: {{ .Values.seed.sqlMountPath | quote }}
+          envFrom:
+            - secretRef:
+                name: {{ include "fullname" . }}-secret
+
+{{- if .Values.seed.debug }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - sleep infinity
+{{- end }}
 
           volumeMounts:
             - name: seed-sql

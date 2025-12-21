@@ -16,11 +16,13 @@ build:
 run: build
 	./bin/$(EXECUTABLE)
 
+lint-helm:
+	helm lint $(HELM_CHART_DIR)
 
 check-worktree:
 	@test -d $(PAGES_DIR) || (echo "Error: $(PAGES_DIR) does not exist. Please run 'git worktree add .gh-pages gh-pages'" && exit 1)
 
-package-helm:
+package-helm: lint-helm
 	helm package $(HELM_CHART_DIR) --destination $(HELM_RELEASE_DIR)
 
 publish-helm: check-worktree package-helm
