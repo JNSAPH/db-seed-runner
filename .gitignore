@@ -33,3 +33,4 @@ helm-releases/
 
 .gh-pages
 .gh-pages/
+sql/*.sql

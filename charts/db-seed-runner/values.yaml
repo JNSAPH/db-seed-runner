@@ -7,7 +7,7 @@ seed:
   debug: false
   sqlConfigMapName: ""
   checksum: ""
-  sqlMountPath: /seed/sql
+  sqlMountPath: /app/sql
 
 database:
   engine: postgres
