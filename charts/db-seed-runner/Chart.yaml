@@ -4,4 +4,4 @@ description: Go-based PostgreSQL seeding runner with Helm chart support
 
 type: application
 version: 0.0.1-dev.5
-appVersion: 0.0.4
+appVersion: 0.0.5
