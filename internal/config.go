@@ -18,7 +18,7 @@ const DefaultConfigPath = "./config"
 type config struct {
 	Seed struct {
 		Enabled           bool   `mapstructure:"enabled" validate:"required"`
-		Debug             bool   `mapstructure:"debug" validate:"required"`
+		Debug             bool   `mapstructure:"debug"`
 		SqlFilesDirectory string `mapstructure:"sqlMountPath" validate:"required_if=Enabled true"`
 	} `mapstructure:"seed" validate:"required"`
 	Database struct {

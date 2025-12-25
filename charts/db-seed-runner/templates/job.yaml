@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "fullname" . }}
+  name: {{ include "fullname" . }}-{{ .Release.Revision }}
   namespace: {{ .Release.Namespace }}
 spec:
   backoffLimit: 1

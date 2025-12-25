@@ -1,6 +1,5 @@
 seed:
   enabled: true
-  debug: true
   sqlMountPath: ./sql
 database:
   engine: postgres
