@@ -63,7 +63,11 @@ var rootCmd = &cobra.Command{
 				Password: dbPassword,
 			})
 
-			client.Connect()
+			err := client.Connect()
+			if err != nil {
+				logrus.Fatalf("Failed to connect to the database: %v", err)
+			}
+			logrus.Info("Successfully connected to the PostgreSQL database")
 			defer client.Close()
 
 			for _, file := range sqlFiles {

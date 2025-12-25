@@ -1,5 +1,11 @@
-# db-seed-runner
-Go-based PostgreSQL seeding runner with Helm chart support
+# DB-Seed-Runner
+<center>
+<img src="./assets/banner.png" alt="db-seed-runner" width="600px" />
+</center>
+
+# Quick Links
+- [What is this?](#what-is-this)
+- [Helm Chart Values](./charts/db-seed-runner/values.yaml)
 
 # What is this?
 
@@ -27,6 +33,12 @@ module "db_seed_runner" {
 ```
 
 # FAQ & Common Issues
+
+## What will happen if the execution of a seed script fails?
+It is possible to have multiple seed scripts. As shown in the example above, if one of the scripts fails, the Job will move on to the next script. This means that a failure in one script does not prevent subsequent scripts from executing. Make sure to work within the safeguards of the database engine you are using and to thoroughly test your seed scripts.
+
+## I need my seed scripts to run in a specific order. How can I ensure that?
+The `db-seed-runner` executes seed scripts in alphabetical order based on their filenames. To control the execution order, you can prefix your script filenames with numbers or letters (e.g., `0001_init.sql`, `0002_add_data.sql`, etc.).
 
 ## Error: `could not download chart: Chart.yaml file is missing`
 
