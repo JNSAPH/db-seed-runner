@@ -10,6 +10,10 @@ REPO_URL := https://jnsaph.github.io/db-seed-runner
 CHART_VERSION := $(shell yq '.version' $(HELM_CHART_DIR)/Chart.yaml)
 CHART_NAME := $(shell yq '.name' $(HELM_CHART_DIR)/Chart.yaml)
 
+# Postgres
+export DB_USER := postgres
+export DB_PASSWORD := password
+
 build:
 	go build -o bin/$(EXECUTABLE) 
 
@@ -27,8 +31,11 @@ package-helm: lint-helm
 
 publish-helm: check-worktree package-helm
 	@if [ -f $(PAGES_DIR)/index.yaml ]; then \
-		yq -e '.entries.$(CHART_NAME)[] | select(.version == "$(CHART_VERSION)")' \
-			$(PAGES_DIR)/index.yaml > /dev/null && \
+		yq -e \
+		  --arg name "$(CHART_NAME)" \
+		  --arg version "$(CHART_VERSION)" \
+		  '.entries[$$name][] | select(.version == $$version)' \
+		  $(PAGES_DIR)/index.yaml > /dev/null && \
 		echo "Error: $(CHART_NAME) version $(CHART_VERSION) already exists. Change the version in $(HELM_CHART_DIR)/Chart.yaml!" && \
 		exit 1 || true; \
 	fi

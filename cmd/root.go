@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/JNSAPH/db-seed-runner/internal"
+	"github.com/JNSAPH/db-seed-runner/internal/db/postgres"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -19,6 +21,8 @@ var rootCmd = &cobra.Command{
 		internal.SetupLogger()
 		internal.SetupConfig()
 
+		logrus.Info("Starting db-seed-runner...")
+
 		level, err := logrus.ParseLevel(internal.AppConfig.Log.Level)
 		if err != nil {
 			logrus.Warnf("Invalid log level '%s', defaulting to info", internal.AppConfig.Log.Level)
@@ -26,15 +30,67 @@ var rootCmd = &cobra.Command{
 		}
 		logrus.SetLevel(level)
 
+		// Get the selected database engine
 		engine := internal.AppConfig.Database.Engine
 		logrus.Infof("Using database engine: %s", engine)
 
+		// DB Creds from env vars
+		dbUser := os.Getenv("DB_USER")
+		dbPassword := os.Getenv("DB_PASSWORD")
+
+		// Get Files in SQL Directory
+		directory := internal.AppConfig.Seed.SqlFilesDirectory
+
+		// Get all .sql files from the directory
+		sqlFiles, err := internal.GetSQLFiles(directory)
+		if err != nil {
+			logrus.Fatalf("Error reading SQL files from directory '%s': %v", directory, err)
+		}
+		if len(sqlFiles) == 0 {
+			logrus.Warnf("No SQL files found in directory '%s'", directory)
+		} else {
+			logrus.Infof("Found %d SQL files in directory '%s' (%v)", len(sqlFiles), directory, sqlFiles)
+		}
+
+		failed_files := []string{}
+
 		switch engine {
+		case "postgres":
+			client := postgres.NewPostgres(&postgres.Credentials{
+				Host:     internal.AppConfig.Database.Host,
+				Port:     internal.AppConfig.Database.Port,
+				User:     dbUser,
+				Password: dbPassword,
+			})
+
+			client.Connect()
+			defer client.Close()
+
+			for _, file := range sqlFiles {
+				logrus.Infof("Executing SQL file: %s", file)
+				if err := client.RunScript(file); err != nil {
+					logrus.Errorf("Failed to execute SQL file '%s': %v", file, err)
+					failed_files = append(failed_files, file)
+					continue
+				}
+				logrus.Infof("Successfully executed SQL file: %s", file)
+			}
 		default:
 			logrus.Fatalf("Unsupported database engine: %s", engine)
 		}
 
-		logrus.Info("Starting db-seed-runner...")
+		logrus.Info("Database seeding completed.")
+
+		logrus.Print("===================================")
+		if len(failed_files) > 0 {
+			logrus.Infof("Some files failed to execute (%d):", len(failed_files))
+			for _, f := range failed_files {
+				logrus.Infof(" - %s", f)
+			}
+		} else {
+			logrus.Info("All files executed successfully!")
+		}
+		logrus.Print("===================================")
 
 	},
 }

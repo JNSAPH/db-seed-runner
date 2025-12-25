@@ -16,16 +16,19 @@ const DefaultConfigName = "config"
 const DefaultConfigPath = "./config"
 
 type config struct {
-	Log struct {
-		Level string `mapstructure:"level" validate:"required,oneof=debug info warn error fatal panic trace"`
-	} `mapstructure:"log" validate:"required"`
+	Seed struct {
+		Enabled           bool   `mapstructure:"enabled" validate:"required"`
+		Debug             bool   `mapstructure:"debug" validate:"required"`
+		SqlFilesDirectory string `mapstructure:"sqlMountPath" validate:"required_if=Enabled true"`
+	} `mapstructure:"seed" validate:"required"`
 	Database struct {
-		Engine   string `mapstructure:"engine" validate:"required,oneof=postgres mysql sqlite"`
-		Host     string `mapstructure:"host" validate:"required"`
-		Port     int    `mapstructure:"port" validate:"required,min=1"`
-		User     string `mapstructure:"user" validate:"required"`
-		Password string `mapstructure:"password" validate:"required"`
+		Engine string `mapstructure:"engine" validate:"required,oneof=postgres"`
+		Host   string `mapstructure:"host" validate:"required"`
+		Port   int    `mapstructure:"port" validate:"required,min=1"`
 	} `mapstructure:"database" validate:"required"`
+	Log struct {
+		Level string `mapstructure:"level" validate:"required,oneof=debug INFO warn error fatal panic trace"`
+	} `mapstructure:"logging" validate:"required"`
 }
 
 var AppConfig *config

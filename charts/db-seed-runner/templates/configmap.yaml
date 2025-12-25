@@ -8,9 +8,11 @@ data:
     seed:
       enabled: {{ .Values.seed.enabled }}
       debug: {{ .Values.seed.debug }}
+      sqlMountPath: {{ .Values.seed.sqlMountPath }}
     database:
       engine: {{ .Values.database.engine }}
       host: {{ .Values.database.host }}
       port: {{ .Values.database.port }}
       name: {{ .Values.database.name }}
-    
+    logging:
+      level: {{ .Values.logging.level | default "INFO" | upper }}
