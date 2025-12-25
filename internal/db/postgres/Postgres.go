@@ -78,17 +78,25 @@ func (p *Postgres) RunScript(filePath string) error {
  * Splits SQL script into individual statements.
  * Handles semicolons within single quotes and dollar-quoted strings.
  */
+// splitSQLStatements splits a SQL script into individual statements.
+// It implements a state machine to correctly handle semicolons within:
+// - Single-quoted strings ('string')
+// - Double-quoted identifiers ("identifier")
+// - Dollar-quoted strings ($tag$string$tag$)
+// - Line comments (-- comment)
+// - Block comments (/* comment */)
 func splitSQLStatements(sqlScript string) []string {
 	var stmts []string
 	var buf strings.Builder
 
-	inString := false
-	inQuotedID := false
-	inDollar := false
-	inLineComment := false
-	inBlockComment := false
+	// State flags
+	inString := false       // Inside '...'
+	inQuotedID := false     // Inside "..."
+	inDollar := false       // Inside $tag$...$tag$
+	inLineComment := false  // Inside -- ...
+	inBlockComment := false // Inside /* ... */
 
-	dollarTag := ""
+	dollarTag := "" // The specific tag for the current dollar-quoted string
 
 	n := len(sqlScript)
 
@@ -99,6 +107,7 @@ func splitSQLStatements(sqlScript string) []string {
 			nextChar = sqlScript[i+1]
 		}
 
+		// 1. Handle Line Comments (-- ...)
 		if inLineComment {
 			if char == '\n' {
 				inLineComment = false
@@ -107,24 +116,27 @@ func splitSQLStatements(sqlScript string) []string {
 			continue
 		}
 
+		// 2. Handle Block Comments (/* ... */)
 		if inBlockComment {
 			if char == '*' && nextChar == '/' {
 				inBlockComment = false
 				buf.WriteByte(char)
 				buf.WriteByte(nextChar)
-				i++
+				i++ // Skip next char
 				continue
 			}
 			buf.WriteByte(char)
 			continue
 		}
 
+		// 3. Handle Single-Quoted Strings ('...')
 		if inString {
 			if char == '\'' {
+				// Check for escaped quote ('')
 				if nextChar == '\'' {
 					buf.WriteByte(char)
 					buf.WriteByte(nextChar)
-					i++
+					i++ // Skip next char
 					continue
 				}
 				inString = false
@@ -133,12 +145,14 @@ func splitSQLStatements(sqlScript string) []string {
 			continue
 		}
 
+		// 4. Handle Double-Quoted Identifiers ("...")
 		if inQuotedID {
 			if char == '"' {
+				// Check for escaped quote ("")
 				if nextChar == '"' {
 					buf.WriteByte(char)
 					buf.WriteByte(nextChar)
-					i++
+					i++ // Skip next char
 					continue
 				}
 				inQuotedID = false
@@ -147,12 +161,14 @@ func splitSQLStatements(sqlScript string) []string {
 			continue
 		}
 
+		// 5. Handle Dollar-Quoted Strings ($tag$ ... $tag$)
 		if inDollar {
 			if char == '$' {
+				// Check if this is the closing tag
 				if strings.HasPrefix(sqlScript[i:], dollarTag) {
 					inDollar = false
 					buf.WriteString(dollarTag)
-					i += len(dollarTag) - 1
+					i += len(dollarTag) - 1 // Skip the rest of the tag
 					continue
 				}
 			}
@@ -160,6 +176,9 @@ func splitSQLStatements(sqlScript string) []string {
 			continue
 		}
 
+		// --- State Transitions (Entering a state) ---
+
+		// Start Line Comment
 		if char == '-' && nextChar == '-' {
 			inLineComment = true
 			buf.WriteByte(char)
@@ -168,6 +187,7 @@ func splitSQLStatements(sqlScript string) []string {
 			continue
 		}
 
+		// Start Block Comment
 		if char == '/' && nextChar == '*' {
 			inBlockComment = true
 			buf.WriteByte(char)
@@ -176,22 +196,27 @@ func splitSQLStatements(sqlScript string) []string {
 			continue
 		}
 
+		// Start String
 		if char == '\'' {
 			inString = true
 			buf.WriteByte(char)
 			continue
 		}
 
+		// Start Quoted Identifier
 		if char == '"' {
 			inQuotedID = true
 			buf.WriteByte(char)
 			continue
 		}
 
+		// Start Dollar Quote
 		if char == '$' {
+			// Look ahead to find the end of the tag
 			end := strings.IndexByte(sqlScript[i+1:], '$')
 			if end != -1 {
 				tag := sqlScript[i : i+1+end+1]
+				// Validate tag format (letters, numbers, underscore)
 				isValidTag := true
 				for _, c := range tag[1 : len(tag)-1] {
 					if !((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_') {
@@ -210,15 +235,20 @@ func splitSQLStatements(sqlScript string) []string {
 			}
 		}
 
+		// --- Statement Split ---
+
+		// If we are not in any special state, a semicolon marks the end of a statement
 		if char == ';' {
 			stmts = append(stmts, buf.String())
 			buf.Reset()
 			continue
 		}
 
+		// Regular character
 		buf.WriteByte(char)
 	}
 
+	// Append any remaining text as the last statement
 	if buf.Len() > 0 {
 		if strings.TrimSpace(buf.String()) != "" {
 			stmts = append(stmts, buf.String())
