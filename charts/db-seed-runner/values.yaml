@@ -1,6 +1,6 @@
 image:
-  repository: busybox
-  tag: latest
+  repository: ghcr.io/jnsaph/db-seed-runner
+  tag: ""
 
 seed:
   enabled: true
